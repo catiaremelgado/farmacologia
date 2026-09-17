@@ -1813,7 +1813,6 @@ const pharmaData = [
     "subsubgrupo": "Ectoparasiticidas e escabicidas"
   },
   {
-    "drug": "Solução de eosina 2% - sol. cutânea",
     "grupo": "Pele e Mucosas",
     "subgrupo": "Anti-infeciosos tópicos",
     "subsubgrupo": "Antisséticos secantes cutâneos"
