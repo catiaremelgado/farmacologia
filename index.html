@@ -49,11 +49,12 @@
     .btn-next:hover { opacity: 0.9; }
 
     .score-banner { text-align: center; margin-top: 18px; font-size: 0.9rem; color: var(--subtext); border-top: 1px solid #334155; padding-top: 12px; }
+    .error-msg { background: #7f1d1d; color: #fecaca; padding: 14px; border-radius: 8px; font-size: 0.95rem; line-height: 1.4; }
   </style>
 </head>
 <body>
 
-  <div class="container">
+  <div class="container" id="app-container">
     <div class="top-bar">
       <span style="font-size: 0.9rem; color: var(--subtext);" id="drug-counter">Fármaco em estudo</span>
       <div class="step-indicator">
@@ -68,7 +69,7 @@
 
     <!-- Caminho já percorrido -->
     <div class="breadcrumbs" id="breadcrumbs">
-      Trajetória: <span id="trail-text">A iniciar...</span>
+      Trajetória: <span id="trail-text">A iniciar no Grupo Principal</span>
     </div>
 
     <div class="options" id="options-container"></div>
@@ -82,62 +83,23 @@
     <div class="score-banner" id="score-tracker">Medicamentos concluídos: 0</div>
   </div>
 
-  <script>
-    /* ==========================================================
-       BASE DE DADOS DE MEDICAMENTOS (Substituímos pelas tuas folhas)
-       ========================================================== */
-    const pharmaData = [
-      {
-        drug: "Amoxicilina",
-        grupo: "Anti-infeciosos",
-        subgrupo: "Antibacterianos",
-        subsubgrupo: "Penicilinas"
-      },
-      {
-        drug: "Ciprofloxacina",
-        grupo: "Anti-infeciosos",
-        subgrupo: "Antibacterianos",
-        subsubgrupo: "Fluoroquinolonas"
-      },
-      {
-        drug: "Omeprazol",
-        grupo: "Aparelho Digestivo",
-        subgrupo: "Antiácidos e Antiulcerosos",
-        subsubgrupo: "Inibidores da Bomba de Protões (IBP)"
-      },
-      {
-        drug: "Ibuprofeno",
-        grupo: "Sistema Nervoso Central e Dor",
-        subgrupo: "Anti-inflamatórios e Antirreumáticos",
-        subsubgrupo: "AINEs (Derivados do Ácido Propiónico)"
-      },
-      {
-        drug: "Metformina",
-        grupo: "Aparelho Hormonal e Metabolismo",
-        subgrupo: "Antidiabéticos",
-        subsubgrupo: "Biguanidas"
-      },
-      {
-        drug: "Atorvastatina",
-        grupo: "Aparelho Cardiovascular",
-        subgrupo: "Hipolipemiantes",
-        subsubgrupo: "Estatinas"
-      },
-      {
-        drug: "Salbutamol",
-        grupo: "Aparelho Respiratório",
-        subgrupo: "Antiasmáticos e Broncodilatadores",
-        subsubgrupo: "Agonistas Beta-2 Adrenérgicos"
-      },
-      {
-        drug: "Diazepam",
-        grupo: "Sistema Nervoso Central",
-        subgrupo: "Psicofármacos",
-        subsubgrupo: "Benzodiazepinas"
-      }
-    ];
+  <!-- 1. Carrega o ficheiro independente de dados -->
+  <script src="medicamentos.js"></script>
 
-    // Os 3 passos da trajetória
+  <!-- 2. Lógica da Aplicação -->
+  <script>
+    // Verificação de segurança: confirma se o ficheiro medicamentos.js foi carregado corretamente
+    if (typeof pharmaData === "undefined" || !Array.isArray(pharmaData) || pharmaData.length === 0) {
+      document.getElementById("app-container").innerHTML = `
+        <div class="error-msg">
+          <strong>Ficheiro de dados não encontrado!</strong><br><br>
+          Certifique-se de que criou o ficheiro <code>medicamentos.js</code> na mesma pasta que o <code>index.html</code> e que a variável <code>pharmaData</code> contém a lista de medicamentos.
+        </div>
+      `;
+      throw new Error("pharmaData não está definido.");
+    }
+
+    // Trajetória: Grupo -> Subgrupo -> Subsubgrupo
     const steps = [
       { key: "grupo", label: "Grupo Principal" },
       { key: "subgrupo", label: "Subgrupo" },
@@ -157,8 +119,9 @@
       return pharmaData[Math.floor(Math.random() * pharmaData.length)];
     }
 
+    // Obtém 3 opções erradas distintas para garantir sempre 4 opções no total
     function getUniqueDistractors(correctVal, key) {
-      const allVals = [...new Set(pharmaData.map(item => item[key]))].filter(val => val !== correctVal);
+      const allVals = [...new Set(pharmaData.map(item => item[key]))].filter(val => val && val !== correctVal);
       const shuffled = shuffle(allVals);
       return shuffled.slice(0, 3);
     }
@@ -234,10 +197,10 @@
       if (selectedVal === correctVal) {
         isStepSuccess = true;
         if (currentStepIndex < 2) {
-          feedbackBox.innerHTML = `<strong>✅ Certo!</strong> Excelente. Agora vamos descer para o próximo nível.`;
+          feedbackBox.innerHTML = `<strong>✅ Certo!</strong> Nível concluído com sucesso.`;
           btnAction.textContent = "Continuar Trajetória &rarr;";
         } else {
-          // Chegou ao fim do 3º nível com sucesso!
+          // Trajetória completa do medicamento
           completedCount++;
           document.getElementById(`dot-2`).className = "step-dot completed";
           feedbackBox.innerHTML = `<strong>🎉 Trajetória Completa!</strong> Identificaste toda a hierarquia de <strong>${currentDrug.drug}</strong>:<br>
@@ -250,7 +213,7 @@
         clickedBtn.classList.add("wrong");
         feedbackBox.innerHTML = `<strong>❌ Incorreto!</strong><br>
         O <strong>${steps[currentStepIndex].label}</strong> correto de <strong>${currentDrug.drug}</strong> é <em>${correctVal}</em>.<br><br>
-        <span style="color:var(--subtext)">Hierarquia completa: ${currentDrug.grupo} &rarr; ${currentDrug.subgrupo} &rarr; ${currentDrug.subsubgrupo}</span>`;
+        <span style="color:var(--subtext)">Hierarquia correta: ${currentDrug.grupo} &rarr; ${currentDrug.subgrupo} &rarr; ${currentDrug.subsubgrupo}</span>`;
         btnAction.textContent = "Tentar Outro Medicamento &rarr;";
       }
 
@@ -266,12 +229,11 @@
           startNewDrug();
         }
       } else {
-        // Se errou, passa para um novo medicamento
         startNewDrug();
       }
     }
 
-    // Iniciar a aplicação
+    // Arrancar com o primeiro fármaco
     startNewDrug();
   </script>
 </body>
