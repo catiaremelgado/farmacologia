@@ -27,7 +27,7 @@
     .step-dot.active { background: var(--accent); color: #0f172a; transform: scale(1.1); }
     .step-dot.completed { background: var(--correct); color: white; }
 
-    .drug-name { font-size: 2.1rem; font-weight: 700; color: var(--accent); margin-bottom: 8px; text-transform: capitalize; }
+    .drug-name { font-size: 1.8rem; font-weight: 700; color: var(--accent); margin-bottom: 8px; text-transform: capitalize; line-height: 1.2; }
     .prompt-label { font-size: 1.05rem; color: var(--text); margin-bottom: 16px; }
     .prompt-target { font-weight: bold; color: #facc15; }
 
@@ -35,7 +35,7 @@
     .breadcrumbs strong { color: var(--text); }
 
     .options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
-    .btn-option { background-color: var(--btn-bg); border: 2px solid transparent; color: var(--text); padding: 14px 16px; border-radius: 10px; font-size: 1rem; text-align: left; cursor: pointer; transition: all 0.2s; font-weight: 500; }
+    .btn-option { background-color: var(--btn-bg); border: 2px solid transparent; color: var(--text); padding: 14px 16px; border-radius: 10px; font-size: 0.98rem; text-align: left; cursor: pointer; transition: all 0.2s; font-weight: 500; }
     .btn-option:hover:not(:disabled) { background-color: var(--btn-hover); transform: translateY(-1px); }
     .btn-option:disabled { cursor: default; }
     
@@ -64,15 +64,13 @@
       </div>
     </div>
 
-    <div class="drug-name" id="drug-name">...</div>
+    <div class="drug-name" id="drug-name">A carregar...</div>
     <div class="prompt-label">Passo: seleciona o <span class="prompt-target" id="prompt-target">Grupo Principal</span></div>
 
-    <!-- Caminho percorrido pelo medicamento atual -->
     <div class="breadcrumbs" id="breadcrumbs">
-      Sequência: <span id="trail-text">A iniciar no Grupo Principal...</span>
+      Sequência: <span id="trail-text">A iniciar...</span>
     </div>
 
-    <!-- 4 Opções sempre -->
     <div class="options" id="options-container"></div>
 
     <div class="feedback-box" id="feedback-box"></div>
@@ -84,20 +82,8 @@
     <div class="score-banner" id="score-tracker">Medicamentos completados com sucesso: 0</div>
   </div>
 
-  <!-- Carrega a lista a partir do ficheiro medicamentos.js -->
-  <script src="medicamentos.js"></script>
-
   <script>
-    // Validação de presença do ficheiro medicamentos.js
-    if (typeof pharmaData === "undefined" || !Array.isArray(pharmaData) || pharmaData.length === 0) {
-      document.getElementById("app-container").innerHTML = `
-        <div class="error-msg">
-          <strong>Ficheiro de dados não encontrado!</strong><br><br>
-          Cria o ficheiro <code>medicamentos.js</code> na mesma pasta com o array <code>pharmaData</code>.
-        </div>
-      `;
-      throw new Error("pharmaData não carregado.");
-    }
+    let pharmaData = [];
 
     const steps = [
       { key: "grupo", label: "Grupo Principal" },
@@ -106,17 +92,35 @@
     ];
 
     let currentDrug = null;
-    let currentStepIndex = 0; // 0 = Grupo, 1 = Subgrupo, 2 = Subsubgrupo
+    let currentStepIndex = 0;
     let completedCount = 0;
     let isStepSuccess = false;
+
+    // Carregar os medicamentos do ficheiro JSON
+    fetch("medicamentos.json")
+      .then(response => {
+        if (!response.ok) throw new Error("Erro ao carregar o ficheiro medicamentos.json");
+        return response.json();
+      })
+      .then(data => {
+        pharmaData = data;
+        startWithNewDrug();
+      })
+      .catch(error => {
+        document.getElementById("app-container").innerHTML = `
+          <div class="error-msg">
+            <strong>Erro ao carregar medicamentos.json!</strong><br><br>
+            Certifica-te de que o ficheiro <code>medicamentos.json</code> está na mesma pasta do repositório no GitHub Pages.
+          </div>
+        `;
+        console.error(error);
+      });
 
     function shuffle(array) {
       return array.slice().sort(() => Math.random() - 0.5);
     }
 
-    // Seleciona um medicamento ao acaso
     function selectNewDrug() {
-      // Evita calhar duas vezes consecutivas exatamente o mesmo se houver mais de 1 medicamento
       let nextDrug = pharmaData[Math.floor(Math.random() * pharmaData.length)];
       if (pharmaData.length > 1 && currentDrug && nextDrug.drug === currentDrug.drug) {
         return selectNewDrug();
@@ -124,7 +128,6 @@
       return nextDrug;
     }
 
-    // Escolhe sempre 3 respostas erradas do mesmo nível para totalizar 4 opções
     function get3Distractors(correctVal, key) {
       const allVals = [...new Set(pharmaData.map(item => item[key]))].filter(val => val && val !== correctVal);
       const shuffled = shuffle(allVals);
@@ -204,26 +207,23 @@
       if (selectedAnswer === correctAnswer) {
         isStepSuccess = true;
         if (currentStepIndex < 2) {
-          // Acertou: continua com o MESMO medicamento para o nível seguinte
           const nextStepLabel = steps[currentStepIndex + 1].label;
-          feedbackBox.innerHTML = `<strong>✅ Correto!</strong><br>Boa! Agora vamos descobrir o <strong>${nextStepLabel}</strong> de <strong>${currentDrug.drug}</strong>.`;
+          feedbackBox.innerHTML = `<strong>✅ Correto!</strong><br>Excelente. Agora escolhe o <strong>${nextStepLabel}</strong> de <strong>${currentDrug.drug}</strong>.`;
           btnAction.textContent = `Avançar para o ${nextStepLabel} →`;
         } else {
-          // Acertou os 3 níveis para o mesmo medicamento!
           completedCount++;
           document.getElementById("dot-2").className = "step-dot completed";
-          feedbackBox.innerHTML = `<strong>🎉 Sequência Completa!</strong><br>Dominaste toda a cadeia de <strong>${currentDrug.drug}</strong>:<br>
+          feedbackBox.innerHTML = `<strong>🎉 Sequência Completa!</strong><br>Identificaste com sucesso toda a árvore de <strong>${currentDrug.drug}</strong>:<br>
           ${currentDrug.grupo} &rarr; ${currentDrug.subgrupo} &rarr; ${currentDrug.subsubgrupo}`;
           btnAction.textContent = "Próximo Medicamento →";
           document.getElementById("score-tracker").textContent = `Medicamentos completados com sucesso: ${completedCount}`;
         }
       } else {
-        // Errou: mostra a hierarquia certa e OBRIGA A TROCAR de medicamento
         isStepSuccess = false;
         clickedBtn.classList.add("wrong");
         feedbackBox.innerHTML = `<strong>❌ Errado!</strong><br>
         O <strong>${steps[currentStepIndex].label}</strong> correto de <strong>${currentDrug.drug}</strong> é <em>${correctAnswer}</em>.<br><br>
-        <span style="color:var(--subtext)">Cadeia completa: ${currentDrug.grupo} &rarr; ${currentDrug.subgrupo} &rarr; ${currentDrug.subsubgrupo}</span>`;
+        <span style="color:var(--subtext)">Sequência correta: ${currentDrug.grupo} &rarr; ${currentDrug.subgrupo} &rarr; ${currentDrug.subsubgrupo}</span>`;
         btnAction.textContent = "Trocar de Medicamento e Recomeçar →";
       }
 
@@ -233,21 +233,15 @@
     function advanceTrajectory() {
       if (isStepSuccess) {
         if (currentStepIndex < 2) {
-          // Continua com o mesmo medicamento
           currentStepIndex++;
           loadQuestion();
         } else {
-          // Já acertou os 3: passa para outro medicamento
           startWithNewDrug();
         }
       } else {
-        // Se errou em qualquer passo: troca imediatamente para outro medicamento
         startWithNewDrug();
       }
     }
-
-    // Início imediato da aplicação
-    startWithNewDrug();
   </script>
 </body>
 </html>
