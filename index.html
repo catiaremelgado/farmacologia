@@ -24,7 +24,6 @@
     .top-bar { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
     .top-title { font-size: 0.85rem; color: var(--subtext); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
     
-    /* Indicadores em cápsula */
     .step-indicator { display: flex; gap: 8px; flex-wrap: wrap; }
     .step-pill { 
       padding: 6px 14px; 
@@ -103,8 +102,19 @@
     <div class="score-banner" id="score-tracker">Medicamentos completados com sucesso: 0</div>
   </div>
 
+  <!-- Carrega os dados de forma direta e sem bloqueios -->
+  <script src="medicamentos.js"></script>
+
   <script>
-    let pharmaData = [];
+    if (typeof pharmaData === "undefined" || !Array.isArray(pharmaData) || pharmaData.length === 0) {
+      document.getElementById("app-container").innerHTML = `
+        <div class="error-msg">
+          <strong>Ficheiro medicamentos.js não encontrado!</strong><br><br>
+          Certifica-te de que criaste o ficheiro <code>medicamentos.js</code> com a variável <code>const pharmaData = [...]</code> na mesma pasta.
+        </div>
+      `;
+      throw new Error("pharmaData não carregado.");
+    }
 
     const steps = [
       { key: "grupo", label: "Grupo Principal" },
@@ -116,26 +126,6 @@
     let currentStepIndex = 0;
     let completedCount = 0;
     let isStepSuccess = false;
-
-    // Carregar os dados a partir do ficheiro medicamentos.json
-    fetch("medicamentos.json")
-      .then(response => {
-        if (!response.ok) throw new Error("Erro ao carregar medicamentos.json");
-        return response.json();
-      })
-      .then(data => {
-        pharmaData = data;
-        startWithNewDrug();
-      })
-      .catch(error => {
-        document.getElementById("app-container").innerHTML = `
-          <div class="error-msg">
-            <strong>Erro ao carregar medicamentos.json!</strong><br><br>
-            Certifica-te de que o ficheiro <code>medicamentos.json</code> está na mesma pasta do repositório no GitHub.
-          </div>
-        `;
-        console.error(error);
-      });
 
     function shuffle(array) {
       return array.slice().sort(() => Math.random() - 0.5);
@@ -270,6 +260,9 @@
         startWithNewDrug();
       }
     }
+
+    // Arrancar a aplicação
+    startWithNewDrug();
   </script>
 </body>
 </html>
