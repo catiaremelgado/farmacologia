@@ -1,5 +1,6 @@
 /* ==========================================================================
-   MOTOR INTEGRADO COM LIMPEZA DE ERROS E TABELA DCI RESPONSIVA (app.js)
+   MOTOR INTEGRADO CORRIGIDO (app.js)
+   Correção na extração de texto das opções e persistência das falhas
    ========================================================================== */
 
 const steps = [
@@ -35,7 +36,9 @@ function shuffle(array) {
 
 function updateMistakesBadge() {
   const badge = document.getElementById("mistakes-count");
-  if (badge) badge.textContent = mistakesSet.size;
+  if (badge) {
+    badge.textContent = mistakesSet.size;
+  }
   localStorage.setItem("pharma_mistakes", JSON.stringify([...mistakesSet]));
 }
 
@@ -209,8 +212,9 @@ function loadQuestion() {
   options.forEach((optionText, index) => {
     const btn = document.createElement("button");
     btn.className = "btn-option";
+    btn.dataset.val = optionText; // Guarda o valor limpo sem tags HTML
     btn.innerHTML = `
-      <span>${optionText}</span>
+      <span class="btn-text">${optionText}</span>
       <span class="key-hint">${index + 1}</span>
     `;
     btn.onclick = () => handleAnswer(btn, optionText, correctAnswer);
@@ -223,7 +227,9 @@ function handleAnswer(clickedBtn, selectedAnswer, correctAnswer) {
   const buttons = document.querySelectorAll("#options-container .btn-option");
   buttons.forEach(b => {
     b.disabled = true;
-    if (b.querySelector("span").textContent === correctAnswer) b.classList.add("correct");
+    if (b.dataset.val === correctAnswer) {
+      b.classList.add("correct");
+    }
   });
 
   const feedbackBox = document.getElementById("feedback-box");
@@ -266,6 +272,7 @@ function handleAnswer(clickedBtn, selectedAnswer, correctAnswer) {
     currentDrugHadFailure = true;
     clickedBtn.classList.add("wrong");
     
+    // Adiciona ao Caderno de Falhas e atualiza o badge imediatamente
     mistakesSet.add(currentDrug.drug);
     updateMistakesBadge();
 
@@ -345,8 +352,9 @@ function loadInverseQuestion() {
   options.forEach((drugName, index) => {
     const btn = document.createElement("button");
     btn.className = "btn-option";
+    btn.dataset.val = drugName;
     btn.innerHTML = `
-      <span>${drugName}</span>
+      <span class="btn-text">${drugName}</span>
       <span class="key-hint">${index + 1}</span>
     `;
     btn.onclick = () => handleInverseAnswer(btn, drugName, currentInvDrug.drug);
@@ -359,7 +367,9 @@ function handleInverseAnswer(clickedBtn, selectedDrug, correctDrug) {
   const buttons = document.querySelectorAll("#inv-options-container .btn-option");
   buttons.forEach(b => {
     b.disabled = true;
-    if (b.querySelector("span").textContent === correctDrug) b.classList.add("correct");
+    if (b.dataset.val === correctDrug) {
+      b.classList.add("correct");
+    }
   });
 
   const feedbackBox = document.getElementById("inv-feedback-box");
@@ -389,7 +399,7 @@ function handleInverseAnswer(clickedBtn, selectedDrug, correctDrug) {
 }
 
 /* ==========================================================================
-   TABELA DCI COM ATRIBUTOS DATA-LABEL PARA MOBILE
+   TABELA DCI COM FILTRAGEM DIRETA
    ========================================================================== */
 
 const dciData = [
