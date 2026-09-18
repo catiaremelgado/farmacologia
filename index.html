@@ -3,266 +3,186 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Quiz de Farmacologia - Trajetória</title>
+  <title>Classificação Farmacoterapêutica | Estudo & Avaliação</title>
+  
+  <!-- Ícone do Separador do Navegador (Favicon embutido) -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💊</text></svg>">
+
   <style>
     :root {
-      --bg: #0f172a;
-      --card-bg: #1e293b;
-      --text: #f8fafc;
-      --subtext: #94a3b8;
-      --accent: #38bdf8;
-      --correct: #22c55e;
-      --wrong: #ef4444;
-      --btn-bg: #334155;
-      --btn-hover: #475569;
+      --bg-page: #0b0f17;
+      --bg-card: #151d2a;
+      --bg-inner: #0f1622;
+      --primary: #38bdf8;
+      --primary-hover: #0ea5e9;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-color: #243042;
+      --success: #10b981;
+      --error: #ef4444;
+      --warning: #f59e0b;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background-color: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 16px; }
-    .container { background-color: var(--card-bg); width: 100%; max-width: 620px; border-radius: 16px; padding: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.4); }
-    
+    body { background-color: var(--bg-page); color: var(--text-main); min-height: 100vh; display: flex; justify-content: center; padding: 20px 16px; }
+
+    .app-wrapper { width: 100%; max-width: 860px; display: flex; flex-direction: column; gap: 20px; }
+
+    /* Barra Superior & Abas */
+    .app-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 16px; flex-wrap: wrap; gap: 12px; }
+    .brand { display: flex; flex-direction: column; gap: 2px; }
+    .brand-title { display: flex; align-items: center; gap: 10px; }
+    .brand-title .symbol { font-size: 1.6rem; color: var(--primary); }
+    .brand h1 { font-size: 1.35rem; font-weight: 700; color: var(--text-main); letter-spacing: -0.01em; }
+    .brand-sub { font-size: 0.8rem; color: var(--text-muted); font-weight: 500; }
+
+    .nav-tabs { display: flex; gap: 8px; }
+    .tab-btn { background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-muted); padding: 9px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s; font-size: 0.9rem; }
+    .tab-btn:hover { color: var(--text-main); border-color: var(--primary); }
+    .tab-btn.active { background: var(--primary); color: #07101e; border-color: var(--primary); font-weight: 700; }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* Cartão Principal */
+    .card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.35); }
+
+    /* Estilos da Avaliação */
     .top-bar { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
-    .top-title { font-size: 0.85rem; color: var(--subtext); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
-    
+    .top-title { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; }
     .step-indicator { display: flex; gap: 8px; flex-wrap: wrap; }
-    .step-pill { 
-      padding: 6px 14px; 
-      border-radius: 20px; 
-      background: #334155; 
-      color: var(--subtext); 
-      font-size: 0.82rem; 
-      font-weight: 600; 
-      transition: all 0.25s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .step-pill.active { 
-      background: var(--accent); 
-      color: #0f172a; 
-      box-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
-    }
-    .step-pill.completed { 
-      background: var(--correct); 
-      color: white; 
-    }
+    .step-pill { padding: 6px 14px; border-radius: 20px; background: var(--border-color); color: var(--text-muted); font-size: 0.82rem; font-weight: 600; transition: all 0.25s ease; }
+    .step-pill.active { background: var(--primary); color: #07101e; font-weight: 700; }
+    .step-pill.completed { background: var(--success); color: white; }
 
-    .drug-name { font-size: 1.85rem; font-weight: 700; color: var(--accent); margin-bottom: 8px; text-transform: capitalize; line-height: 1.25; }
-    .prompt-label { font-size: 1.05rem; color: var(--text); margin-bottom: 16px; }
-    .prompt-target { font-weight: bold; color: #facc15; }
+    .drug-name { font-size: 1.9rem; font-weight: 800; color: var(--primary); margin-bottom: 6px; }
+    .prompt-label { font-size: 1.05rem; color: var(--text-main); margin-bottom: 16px; }
+    .prompt-target { font-weight: 700; color: #facc15; }
 
-    .breadcrumbs { background: #0f172a; padding: 10px 14px; border-radius: 8px; margin-bottom: 20px; font-size: 0.85rem; color: var(--subtext); line-height: 1.5; }
-    .breadcrumbs strong { color: var(--text); }
+    .breadcrumbs { background: var(--bg-inner); padding: 10px 14px; border-radius: 8px; margin-bottom: 20px; font-size: 0.85rem; color: var(--text-muted); border: 1px solid rgba(255,255,255,0.05); }
 
-    .options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
-    .btn-option { background-color: var(--btn-bg); border: 2px solid transparent; color: var(--text); padding: 14px 16px; border-radius: 10px; font-size: 0.98rem; text-align: left; cursor: pointer; transition: all 0.2s; font-weight: 500; }
-    .btn-option:hover:not(:disabled) { background-color: var(--btn-hover); transform: translateY(-1px); }
+    .options-grid { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+    .btn-option { background: var(--bg-inner); border: 1.5px solid var(--border-color); color: var(--text-main); padding: 14px 16px; border-radius: 10px; font-size: 0.98rem; text-align: left; cursor: pointer; transition: all 0.2s; font-weight: 500; }
+    .btn-option:hover:not(:disabled) { border-color: var(--primary); background: #192334; transform: translateY(-1px); }
     .btn-option:disabled { cursor: default; }
-    
-    .btn-option.correct { background-color: var(--correct); color: white; border-color: var(--correct); }
-    .btn-option.wrong { background-color: var(--wrong); color: white; border-color: var(--wrong); }
-    
-    .feedback-box { margin-bottom: 18px; padding: 14px; border-radius: 8px; background: #0f172a; display: none; font-size: 0.95rem; line-height: 1.5; }
-    
-    .actions { display: flex; justify-content: flex-end; }
-    .btn-next { background-color: var(--accent); color: #0f172a; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 700; font-size: 1rem; cursor: pointer; display: none; }
-    .btn-next:hover { opacity: 0.9; }
+    .btn-option.correct { background: var(--success); color: white; border-color: var(--success); font-weight: 700; }
+    .btn-option.wrong { background: var(--error); color: white; border-color: var(--error); }
 
-    .score-banner { text-align: center; margin-top: 18px; font-size: 0.9rem; color: var(--subtext); border-top: 1px solid #334155; padding-top: 12px; }
-    .error-msg { background: #7f1d1d; color: #fecaca; padding: 14px; border-radius: 8px; font-size: 0.95rem; line-height: 1.4; }
+    .feedback-card { margin-bottom: 18px; padding: 16px; border-radius: 10px; background: var(--bg-inner); display: none; font-size: 0.95rem; line-height: 1.5; border: 1px solid var(--border-color); }
+    .feedback-clinical { margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--border-color); color: var(--text-muted); font-size: 0.88rem; }
+
+    .card-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 16px; }
+    .score-tracker { font-size: 0.9rem; color: var(--text-muted); font-weight: 600; }
+    .btn-action { background: var(--primary); color: #07101e; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 700; font-size: 0.95rem; cursor: pointer; display: none; }
+    .btn-action:hover { background: var(--primary-hover); }
+
+    /* Guia de Consulta Ajustado sem Scroll Interno */
+    .guide-header { margin-bottom: 20px; }
+    .guide-header h2 { font-size: 1.4rem; color: var(--primary); margin-bottom: 4px; }
+    .guide-subtitle { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 16px; }
+
+    .search-bar { display: flex; align-items: center; gap: 12px; background: var(--bg-inner); border: 1px solid var(--border-color); padding: 10px 16px; border-radius: 10px; margin-bottom: 20px; }
+    .search-bar input { width: 100%; background: transparent; border: none; outline: none; color: var(--text-main); font-size: 0.95rem; }
+    .search-counter { font-size: 0.8rem; color: var(--text-muted); white-space: nowrap; }
+
+    /* Fluxo natural sem scrollbars duplicadas */
+    .guide-list { display: flex; flex-direction: column; gap: 16px; }
+
+    /* Ficha Técnica */
+    .guide-item { background: var(--bg-inner); border: 1px solid var(--border-color); border-radius: 12px; padding: 18px; display: flex; flex-direction: column; gap: 12px; }
+    .item-top { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 8px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px; }
+    .item-drug { font-size: 1.2rem; font-weight: 800; color: var(--text-main); }
+    .item-trail { font-size: 0.8rem; color: var(--primary); font-weight: 600; }
+
+    .item-body { display: grid; grid-template-columns: 1fr; gap: 10px; font-size: 0.9rem; line-height: 1.45; }
+    .tech-block strong { color: #cbd5e1; display: block; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 3px; }
+    .tech-block.mechanism p { color: #e2e8f0; }
+    .tech-block.indications p { color: #93c5fd; }
+    .tech-block.alert { background: rgba(245, 158, 11, 0.08); padding: 10px; border-left: 3px solid var(--warning); border-radius: 4px; }
+    .tech-block.alert p { color: #fde68a; font-size: 0.88rem; }
+
+    /* Rodapé / Aviso Legal */
+    .app-disclaimer { text-align: center; padding: 16px 20px; border-top: 1px solid var(--border-color); margin-top: 10px; }
+    .app-disclaimer p { font-size: 0.76rem; line-height: 1.5; color: var(--text-muted); max-width: 720px; margin: 0 auto; }
+    .app-disclaimer strong { color: #cbd5e1; }
   </style>
 </head>
 <body>
 
-  <div class="container" id="app-container">
-    <div class="top-bar">
-      <div class="top-title">Sequência Farmacológica</div>
-      <div class="step-indicator">
-        <div class="step-pill active" id="pill-0">Grupo Principal</div>
-        <div class="step-pill" id="pill-1">Subgrupo</div>
-        <div class="step-pill" id="pill-2">Subsubgrupo</div>
+  <div class="app-wrapper">
+    <!-- Cabeçalho -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-title">
+          <span class="symbol">⚕</span>
+          <h1>Classificação Farmacoterapêutica</h1>
+        </div>
+        <span class="brand-sub">Sistema de Avaliação e Prontuário Clínico</span>
       </div>
-    </div>
+      <nav class="nav-tabs">
+        <button class="tab-btn active" id="tab-quiz-btn" onclick="switchTab('quiz')">Avaliação Sequencial</button>
+        <button class="tab-btn" id="tab-guide-btn" onclick="switchTab('guide')">Prontuário de Consulta</button>
+      </nav>
+    </header>
 
-    <div class="drug-name" id="drug-name">A carregar...</div>
-    <div class="prompt-label">Passo: seleciona o <span class="prompt-target" id="prompt-target">Grupo Principal</span></div>
+    <!-- ABA 1: AVALIAÇÃO -->
+    <main class="tab-content active" id="view-quiz">
+      <div class="card quiz-card">
+        <div class="top-bar">
+          <span class="top-title">Hierarquia Farmacológica</span>
+          <div class="step-indicator">
+            <div class="step-pill active" id="pill-0">Grupo Principal</div>
+            <div class="step-pill" id="pill-1">Subgrupo</div>
+            <div class="step-pill" id="pill-2">Subsubgrupo</div>
+          </div>
+        </div>
 
-    <div class="breadcrumbs" id="breadcrumbs">
-      Sequência: <span id="trail-text">A iniciar...</span>
-    </div>
+        <div class="drug-name" id="drug-name">A carregar...</div>
+        <div class="prompt-label">Passo: selecione o <span class="prompt-target" id="prompt-target">Grupo Principal</span></div>
 
-    <div class="options" id="options-container"></div>
+        <div class="breadcrumbs" id="breadcrumbs">
+          Cadeia identificada: <span id="trail-text">A iniciar...</span>
+        </div>
 
-    <div class="feedback-box" id="feedback-box"></div>
+        <div class="options-grid" id="options-container"></div>
 
-    <div class="actions">
-      <button class="btn-next" id="btn-action" onclick="advanceTrajectory()">Avançar</button>
-    </div>
+        <div class="feedback-card" id="feedback-box"></div>
 
-    <div class="score-banner" id="score-tracker">Medicamentos completados com sucesso: 0</div>
+        <div class="card-footer">
+          <div class="score-tracker" id="score-tracker">Medicamentos concluídos: 0</div>
+          <button class="btn-action" id="btn-action" onclick="advanceTrajectory()">Avançar</button>
+        </div>
+      </div>
+    </main>
+
+    <!-- ABA 2: PRONTUÁRIO -->
+    <main class="tab-content" id="view-guide">
+      <div class="card guide-container">
+        <div class="guide-header">
+          <h2>Prontuário & Fichas Farmacológicas</h2>
+          <p class="guide-subtitle">Mecanismos de ação moleculares, indicações clínicas aprovadas e alertas farmacoterapêuticos.</p>
+          <div class="search-bar">
+            <input type="text" id="search-input" placeholder="Pesquisar por princípio ativo, grupo ou patologia..." oninput="filterGuide()" />
+            <span class="search-counter" id="search-counter">...</span>
+          </div>
+        </div>
+
+        <div class="guide-list" id="guide-list"></div>
+      </div>
+    </main>
+
+    <!-- Rodapé -->
+    <footer class="app-disclaimer">
+      <p>
+        <strong>Aviso:</strong> Esta aplicação tem fins estritamente pedagógicos e de apoio ao estudo. 
+        As informações apresentadas não dispensam nem substituem a consulta das fontes oficiais 
+        e diretrizes atualizadas do <strong>Infarmed</strong> (Infomed / Prontuário Terapêutico) 
+        ou do Resumo das Características do Medicamento (RCM).
+      </p>
+    </footer>
   </div>
 
-  <!-- Carrega os dados de forma direta e sem bloqueios -->
   <script src="medicamentos.js"></script>
-
-  <script>
-    if (typeof pharmaData === "undefined" || !Array.isArray(pharmaData) || pharmaData.length === 0) {
-      document.getElementById("app-container").innerHTML = `
-        <div class="error-msg">
-          <strong>Ficheiro medicamentos.js não encontrado!</strong><br><br>
-          Certifica-te de que criaste o ficheiro <code>medicamentos.js</code> com a variável <code>const pharmaData = [...]</code> na mesma pasta.
-        </div>
-      `;
-      throw new Error("pharmaData não carregado.");
-    }
-
-    const steps = [
-      { key: "grupo", label: "Grupo Principal" },
-      { key: "subgrupo", label: "Subgrupo" },
-      { key: "subsubgrupo", label: "Subsubgrupo" }
-    ];
-
-    let currentDrug = null;
-    let currentStepIndex = 0;
-    let completedCount = 0;
-    let isStepSuccess = false;
-
-    function shuffle(array) {
-      return array.slice().sort(() => Math.random() - 0.5);
-    }
-
-    function selectNewDrug() {
-      let nextDrug = pharmaData[Math.floor(Math.random() * pharmaData.length)];
-      if (pharmaData.length > 1 && currentDrug && nextDrug.drug === currentDrug.drug) {
-        return selectNewDrug();
-      }
-      return nextDrug;
-    }
-
-    function get3Distractors(correctVal, key) {
-      const allVals = [...new Set(pharmaData.map(item => item[key]))].filter(val => val && val !== correctVal);
-      const shuffled = shuffle(allVals);
-      return shuffled.slice(0, 3);
-    }
-
-    function updateStepPills() {
-      for (let i = 0; i < 3; i++) {
-        const pill = document.getElementById(`pill-${i}`);
-        const baseName = steps[i].label;
-        pill.className = "step-pill";
-
-        if (i < currentStepIndex) {
-          pill.classList.add("completed");
-          pill.innerHTML = `✓ ${baseName}`;
-        } else if (i === currentStepIndex) {
-          pill.classList.add("active");
-          pill.textContent = baseName;
-        } else {
-          pill.textContent = baseName;
-        }
-      }
-    }
-
-    function updateTrail() {
-      let parts = [];
-      if (currentStepIndex > 0) parts.push(`<strong>Grupo:</strong> ${currentDrug.grupo}`);
-      if (currentStepIndex > 1) parts.push(`<strong>Subgrupo:</strong> ${currentDrug.subgrupo}`);
-      if (currentStepIndex > 2) parts.push(`<strong>Subsubgrupo:</strong> ${currentDrug.subsubgrupo}`);
-
-      document.getElementById("trail-text").innerHTML = parts.length > 0 
-        ? parts.join(" &rarr; ") 
-        : "A iniciar no Grupo Principal";
-    }
-
-    function startWithNewDrug() {
-      currentDrug = selectNewDrug();
-      currentStepIndex = 0;
-      loadQuestion();
-    }
-
-    function loadQuestion() {
-      isStepSuccess = false;
-      updateStepPills();
-      updateTrail();
-
-      const step = steps[currentStepIndex];
-      document.getElementById("drug-name").textContent = currentDrug.drug;
-      document.getElementById("prompt-target").textContent = step.label;
-
-      const feedbackBox = document.getElementById("feedback-box");
-      const btnAction = document.getElementById("btn-action");
-      feedbackBox.style.display = "none";
-      btnAction.style.display = "none";
-
-      const correctAnswer = currentDrug[step.key];
-      const distractors = get3Distractors(correctAnswer, step.key);
-      const options = shuffle([correctAnswer, ...distractors]);
-
-      const container = document.getElementById("options-container");
-      container.innerHTML = "";
-
-      options.forEach(optionText => {
-        const btn = document.createElement("button");
-        btn.className = "btn-option";
-        btn.textContent = optionText;
-        btn.onclick = () => handleAnswer(btn, optionText, correctAnswer);
-        container.appendChild(btn);
-      });
-    }
-
-    function handleAnswer(clickedBtn, selectedAnswer, correctAnswer) {
-      const buttons = document.querySelectorAll(".btn-option");
-      buttons.forEach(b => {
-        b.disabled = true;
-        if (b.textContent === correctAnswer) b.classList.add("correct");
-      });
-
-      const feedbackBox = document.getElementById("feedback-box");
-      const btnAction = document.getElementById("btn-action");
-      feedbackBox.style.display = "block";
-
-      if (selectedAnswer === correctAnswer) {
-        isStepSuccess = true;
-        if (currentStepIndex < 2) {
-          const nextStepLabel = steps[currentStepIndex + 1].label;
-          feedbackBox.innerHTML = `<strong>✅ Correto!</strong><br>Excelente. Agora escolhe o <strong>${nextStepLabel}</strong> de <strong>${currentDrug.drug}</strong>.`;
-          btnAction.textContent = `Avançar para o ${nextStepLabel} →`;
-        } else {
-          completedCount++;
-          document.getElementById("pill-2").classList.add("completed");
-          document.getElementById("pill-2").innerHTML = `✓ ${steps[2].label}`;
-          feedbackBox.innerHTML = `<strong>🎉 Sequência Completa!</strong><br>Identificaste com sucesso toda a hierarquia de <strong>${currentDrug.drug}</strong>:<br>
-          ${currentDrug.grupo} &rarr; ${currentDrug.subgrupo} &rarr; ${currentDrug.subsubgrupo}`;
-          btnAction.textContent = "Próximo Medicamento →";
-          document.getElementById("score-tracker").textContent = `Medicamentos completados com sucesso: ${completedCount}`;
-        }
-      } else {
-        isStepSuccess = false;
-        clickedBtn.classList.add("wrong");
-        feedbackBox.innerHTML = `<strong>❌ Errado!</strong><br>
-        O <strong>${steps[currentStepIndex].label}</strong> correto de <strong>${currentDrug.drug}</strong> é <em>${correctAnswer}</em>.<br><br>
-        <span style="color:var(--subtext)">Sequência correta: ${currentDrug.grupo} &rarr; ${currentDrug.subgrupo} &rarr; ${currentDrug.subsubgrupo}</span>`;
-        btnAction.textContent = "Trocar de Medicamento e Recomeçar →";
-      }
-
-      btnAction.style.display = "inline-block";
-    }
-
-    function advanceTrajectory() {
-      if (isStepSuccess) {
-        if (currentStepIndex < 2) {
-          currentStepIndex++;
-          loadQuestion();
-        } else {
-          startWithNewDrug();
-        }
-      } else {
-        startWithNewDrug();
-      }
-    }
-
-    // Arrancar a aplicação
-    startWithNewDrug();
-  </script>
+  <script src="app.js"></script>
 </body>
 </html>
