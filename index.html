@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Classificação Farmacoterapêutica | Estudo & Avaliação</title>
   
-  <!-- Ícone do Separador do Navegador (Favicon embutido) -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💊</text></svg>">
+  <link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22Classifica%C3%A7%C3%A3o%20Farmacoterap%C3%AAutica%22%2C%22short_name%22%3A%22PharmaStudy%22%2C%22start_url%22%3A%22.%2F%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230b0f17%22%2C%22theme_color%22%3A%22%230b0f17%22%7D">
 
   <style>
     :root {
@@ -24,9 +24,9 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background-color: var(--bg-page); color: var(--text-main); min-height: 100vh; display: flex; justify-content: center; padding: 20px 16px; }
+    body { background-color: var(--bg-page); color: var(--text-main); min-height: 100vh; display: flex; justify-content: center; padding: 16px 12px; }
 
-    .app-wrapper { width: 100%; max-width: 860px; display: flex; flex-direction: column; gap: 20px; }
+    .app-wrapper { width: 100%; max-width: 880px; display: flex; flex-direction: column; gap: 16px; }
 
     /* Barra Superior & Abas */
     .app-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 16px; flex-wrap: wrap; gap: 12px; }
@@ -36,126 +36,236 @@
     .brand h1 { font-size: 1.35rem; font-weight: 700; color: var(--text-main); letter-spacing: -0.01em; }
     .brand-sub { font-size: 0.8rem; color: var(--text-muted); font-weight: 500; }
 
-    .nav-tabs { display: flex; gap: 8px; }
-    .tab-btn { background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-muted); padding: 9px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s; font-size: 0.9rem; }
+    .nav-tabs { display: flex; gap: 6px; flex-wrap: wrap; width: 100%; }
+    .tab-btn { background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-muted); padding: 8px 12px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s; font-size: 0.84rem; flex: 1 1 auto; text-align: center; }
     .tab-btn:hover { color: var(--text-main); border-color: var(--primary); }
     .tab-btn.active { background: var(--primary); color: #07101e; border-color: var(--primary); font-weight: 700; }
 
     .tab-content { display: none; }
     .tab-content.active { display: block; }
 
-    /* Cartão Principal */
-    .card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.35); }
+    /* Cartão Base */
+    .card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.35); }
 
-    /* Estilos da Avaliação */
-    .top-bar { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
-    .top-title { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; }
-    .step-indicator { display: flex; gap: 8px; flex-wrap: wrap; }
-    .step-pill { padding: 6px 14px; border-radius: 20px; background: var(--border-color); color: var(--text-muted); font-size: 0.82rem; font-weight: 600; transition: all 0.25s ease; }
+    /* Controlos do Quiz */
+    .quiz-controls { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px solid var(--border-color); }
+    .control-group { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .filter-wrapper { display: flex; align-items: center; gap: 6px; font-size: 0.82rem; color: var(--text-muted); }
+    .filter-select { background: var(--bg-inner); border: 1px solid var(--border-color); color: var(--text-main); padding: 6px 10px; border-radius: 8px; font-size: 0.82rem; outline: none; cursor: pointer; }
+    
+    .mistakes-controls { display: flex; align-items: center; gap: 6px; }
+    .btn-mistakes-toggle { background: var(--bg-inner); border: 1px solid var(--border-color); color: var(--text-muted); padding: 6px 12px; border-radius: 8px; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .btn-mistakes-toggle:hover { border-color: var(--warning); color: var(--text-main); }
+    .btn-mistakes-toggle.active { background: rgba(245, 158, 11, 0.15); border-color: var(--warning); color: #fde68a; }
+
+    .btn-clear-mistakes { background: var(--bg-inner); border: 1px solid var(--border-color); color: var(--text-muted); padding: 6px 10px; border-radius: 8px; font-size: 0.82rem; cursor: pointer; transition: all 0.2s; }
+    .btn-clear-mistakes:hover { border-color: var(--error); color: var(--error); }
+
+    /* Estilos do Quiz */
+    .top-bar { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+    .top-title { font-size: 0.78rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; }
+    .step-indicator { display: flex; gap: 6px; flex-wrap: wrap; }
+    .step-pill { padding: 5px 12px; border-radius: 20px; background: var(--border-color); color: var(--text-muted); font-size: 0.78rem; font-weight: 600; transition: all 0.25s ease; }
     .step-pill.active { background: var(--primary); color: #07101e; font-weight: 700; }
     .step-pill.completed { background: var(--success); color: white; }
 
-    .drug-name { font-size: 1.9rem; font-weight: 800; color: var(--primary); margin-bottom: 6px; }
-    .prompt-label { font-size: 1.05rem; color: var(--text-main); margin-bottom: 16px; }
+    .drug-name { font-size: 1.65rem; font-weight: 800; color: var(--primary); margin-bottom: 6px; word-break: break-word; }
+    .prompt-label { font-size: 0.98rem; color: var(--text-main); margin-bottom: 14px; }
     .prompt-target { font-weight: 700; color: #facc15; }
 
-    .breadcrumbs { background: var(--bg-inner); padding: 10px 14px; border-radius: 8px; margin-bottom: 20px; font-size: 0.85rem; color: var(--text-muted); border: 1px solid rgba(255,255,255,0.05); }
+    .breadcrumbs { background: var(--bg-inner); padding: 10px 12px; border-radius: 8px; margin-bottom: 16px; font-size: 0.82rem; color: var(--text-muted); border: 1px solid rgba(255,255,255,0.05); }
 
-    .options-grid { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
-    .btn-option { background: var(--bg-inner); border: 1.5px solid var(--border-color); color: var(--text-main); padding: 14px 16px; border-radius: 10px; font-size: 0.98rem; text-align: left; cursor: pointer; transition: all 0.2s; font-weight: 500; }
+    .options-grid { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+    .btn-option { background: var(--bg-inner); border: 1.5px solid var(--border-color); color: var(--text-main); padding: 12px 14px; border-radius: 10px; font-size: 0.94rem; text-align: left; cursor: pointer; transition: all 0.2s; font-weight: 500; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
     .btn-option:hover:not(:disabled) { border-color: var(--primary); background: #192334; transform: translateY(-1px); }
     .btn-option:disabled { cursor: default; }
     .btn-option.correct { background: var(--success); color: white; border-color: var(--success); font-weight: 700; }
     .btn-option.wrong { background: var(--error); color: white; border-color: var(--error); }
+    .key-hint { font-size: 0.7rem; padding: 2px 6px; background: rgba(255,255,255,0.08); border-radius: 4px; color: var(--text-muted); font-weight: 600; flex-shrink: 0; }
 
-    .feedback-card { margin-bottom: 18px; padding: 16px; border-radius: 10px; background: var(--bg-inner); display: none; font-size: 0.95rem; line-height: 1.5; border: 1px solid var(--border-color); }
-    .feedback-clinical { margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--border-color); color: var(--text-muted); font-size: 0.88rem; }
+    .feedback-card { margin-bottom: 16px; padding: 14px; border-radius: 10px; background: var(--bg-inner); display: none; font-size: 0.92rem; line-height: 1.45; border: 1px solid var(--border-color); }
+    .feedback-clinical { margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--border-color); color: var(--text-muted); font-size: 0.85rem; }
+    .btn-consult-link { display: inline-block; margin-top: 10px; font-size: 0.82rem; color: var(--primary); background: none; border: none; cursor: pointer; text-decoration: underline; padding: 0; font-weight: 600; }
+    .btn-consult-link:hover { color: var(--primary-hover); }
 
-    .card-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 16px; }
-    .score-tracker { font-size: 0.9rem; color: var(--text-muted); font-weight: 600; }
-    .btn-action { background: var(--primary); color: #07101e; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 700; font-size: 0.95rem; cursor: pointer; display: none; }
+    .card-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 14px; flex-wrap: wrap; gap: 10px; }
+    .score-tracker { font-size: 0.85rem; color: var(--text-muted); font-weight: 600; }
+    .btn-action { background: var(--primary); color: #07101e; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 700; font-size: 0.92rem; cursor: pointer; display: none; }
     .btn-action:hover { background: var(--primary-hover); }
 
-    /* Guia de Consulta Ajustado sem Scroll Interno */
-    .guide-header { margin-bottom: 20px; }
-    .guide-header h2 { font-size: 1.4rem; color: var(--primary); margin-bottom: 4px; }
-    .guide-subtitle { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 16px; }
+    /* Ecrã de Resultados */
+    .exam-results { display: none; text-align: center; padding: 16px 0; }
+    .exam-results h3 { font-size: 1.4rem; color: var(--primary); margin-bottom: 8px; }
+    .exam-score-big { font-size: 3rem; font-weight: 800; color: #facc15; margin: 8px 0; }
+    .exam-details { font-size: 0.95rem; color: var(--text-muted); margin-bottom: 20px; }
 
-    .search-bar { display: flex; align-items: center; gap: 12px; background: var(--bg-inner); border: 1px solid var(--border-color); padding: 10px 16px; border-radius: 10px; margin-bottom: 20px; }
-    .search-bar input { width: 100%; background: transparent; border: none; outline: none; color: var(--text-main); font-size: 0.95rem; }
-    .search-counter { font-size: 0.8rem; color: var(--text-muted); white-space: nowrap; }
+    /* Modo Inverso */
+    .inverse-tree { background: var(--bg-inner); border: 1px solid var(--border-color); padding: 14px; border-radius: 10px; margin-bottom: 16px; }
+    .tree-step { font-size: 0.88rem; color: var(--text-muted); margin-bottom: 4px; }
+    .tree-step strong { color: var(--text-main); }
+    .tree-highlight { color: #facc15; font-size: 1.05rem; font-weight: 700; margin-top: 6px; }
 
-    /* Fluxo natural sem scrollbars duplicadas */
-    .guide-list { display: flex; flex-direction: column; gap: 16px; }
+    /* Prontuário */
+    .guide-header { margin-bottom: 16px; }
+    .guide-header h2 { font-size: 1.3rem; color: var(--primary); margin-bottom: 4px; }
+    .guide-subtitle { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 14px; }
 
-    /* Ficha Técnica */
-    .guide-item { background: var(--bg-inner); border: 1px solid var(--border-color); border-radius: 12px; padding: 18px; display: flex; flex-direction: column; gap: 12px; }
-    .item-top { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 8px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px; }
-    .item-drug { font-size: 1.2rem; font-weight: 800; color: var(--text-main); }
-    .item-trail { font-size: 0.8rem; color: var(--primary); font-weight: 600; }
+    .search-bar { display: flex; align-items: center; gap: 10px; background: var(--bg-inner); border: 1px solid var(--border-color); padding: 8px 14px; border-radius: 10px; margin-bottom: 16px; }
+    .search-bar input { width: 100%; background: transparent; border: none; outline: none; color: var(--text-main); font-size: 0.9rem; }
+    .search-counter { font-size: 0.78rem; color: var(--text-muted); white-space: nowrap; }
 
-    .item-body { display: grid; grid-template-columns: 1fr; gap: 10px; font-size: 0.9rem; line-height: 1.45; }
-    .tech-block strong { color: #cbd5e1; display: block; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 3px; }
+    .guide-list { display: flex; flex-direction: column; gap: 14px; }
+    .guide-item { background: var(--bg-inner); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+    .item-top { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 6px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 6px; }
+    .item-drug { font-size: 1.15rem; font-weight: 800; color: var(--text-main); word-break: break-word; }
+    .item-trail { font-size: 0.78rem; color: var(--primary); font-weight: 600; }
+
+    .item-body { display: grid; grid-template-columns: 1fr; gap: 8px; font-size: 0.88rem; line-height: 1.4; }
+    .tech-block strong { color: #cbd5e1; display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px; }
     .tech-block.mechanism p { color: #e2e8f0; }
     .tech-block.indications p { color: #93c5fd; }
-    .tech-block.alert { background: rgba(245, 158, 11, 0.08); padding: 10px; border-left: 3px solid var(--warning); border-radius: 4px; }
-    .tech-block.alert p { color: #fde68a; font-size: 0.88rem; }
+    .tech-block.alert { background: rgba(245, 158, 11, 0.08); padding: 8px 10px; border-left: 3px solid var(--warning); border-radius: 4px; }
+    .tech-block.alert p { color: #fde68a; font-size: 0.84rem; }
 
-    /* Rodapé / Aviso Legal */
-    .app-disclaimer { text-align: center; padding: 16px 20px; border-top: 1px solid var(--border-color); margin-top: 10px; }
-    .app-disclaimer p { font-size: 0.76rem; line-height: 1.5; color: var(--text-muted); max-width: 720px; margin: 0 auto; }
+    /* Tabela DCI Responsiva / Mobile */
+    .dci-table-wrapper { width: 100%; margin-top: 10px; }
+    .dci-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.88rem; }
+    .dci-table th { background: var(--bg-inner); color: var(--primary); padding: 10px 12px; border: 1px solid var(--border-color); font-weight: 700; text-transform: uppercase; font-size: 0.76rem; }
+    .dci-table td { padding: 10px 12px; border: 1px solid var(--border-color); color: #cbd5e1; vertical-align: middle; }
+    .dci-table tr:hover td { background: rgba(56, 189, 248, 0.03); }
+    
+    .suffix-tag-btn { background: rgba(56, 189, 248, 0.15); color: var(--primary); border: 1px solid rgba(56, 189, 248, 0.3); padding: 3px 8px; border-radius: 6px; font-weight: 700; font-family: monospace; font-size: 0.9rem; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+    .suffix-tag-btn:hover { background: var(--primary); color: #07101e; }
+
+    /* Visual em Cartões no Telemóvel */
+    @media (max-width: 650px) {
+      .dci-table thead { display: none; }
+      .dci-table, .dci-table tbody, .dci-table tr, .dci-table td { display: block; width: 100%; }
+      .dci-table tr { background: var(--bg-inner); border: 1px solid var(--border-color); border-radius: 10px; margin-bottom: 12px; padding: 12px; }
+      .dci-table td { border: none; padding: 4px 0; }
+      .dci-table td:first-child { margin-bottom: 6px; }
+      .dci-table td[data-label]::before { content: attr(data-label) ": "; font-weight: 700; color: #94a3b8; font-size: 0.76rem; text-transform: uppercase; }
+    }
+
+    /* Rodapé */
+    .app-disclaimer { text-align: center; padding: 14px; border-top: 1px solid var(--border-color); margin-top: 6px; }
+    .app-disclaimer p { font-size: 0.74rem; line-height: 1.45; color: var(--text-muted); max-width: 720px; margin: 0 auto; }
     .app-disclaimer strong { color: #cbd5e1; }
   </style>
 </head>
 <body>
 
   <div class="app-wrapper">
-    <!-- Cabeçalho -->
     <header class="app-header">
       <div class="brand">
         <div class="brand-title">
           <span class="symbol">⚕</span>
           <h1>Classificação Farmacoterapêutica</h1>
         </div>
-        <span class="brand-sub">Sistema de Avaliação e Prontuário Clínico</span>
+        <span class="brand-sub">Sistema de Avaliação & Prontuário Clínico</span>
       </div>
       <nav class="nav-tabs">
         <button class="tab-btn active" id="tab-quiz-btn" onclick="switchTab('quiz')">Avaliação Sequencial</button>
-        <button class="tab-btn" id="tab-guide-btn" onclick="switchTab('guide')">Prontuário de Consulta</button>
+        <button class="tab-btn" id="tab-inverse-btn" onclick="switchTab('inverse')">Modo Inverso</button>
+        <button class="tab-btn" id="tab-guide-btn" onclick="switchTab('guide')">Prontuário</button>
+        <button class="tab-btn" id="tab-dci-btn" onclick="switchTab('dci')">Radicais DCI</button>
       </nav>
     </header>
 
-    <!-- ABA 1: AVALIAÇÃO -->
+    <!-- ABA 1: AVALIAÇÃO SEQUENCIAL -->
     <main class="tab-content active" id="view-quiz">
       <div class="card quiz-card">
-        <div class="top-bar">
-          <span class="top-title">Hierarquia Farmacológica</span>
-          <div class="step-indicator">
-            <div class="step-pill active" id="pill-0">Grupo Principal</div>
-            <div class="step-pill" id="pill-1">Subgrupo</div>
-            <div class="step-pill" id="pill-2">Subsubgrupo</div>
+        
+        <div class="quiz-controls" id="quiz-controls-bar">
+          <div class="control-group">
+            <div class="filter-wrapper">
+              <span>Grupo:</span>
+              <select class="filter-select" id="group-filter" onchange="onGroupFilterChange()">
+                <option value="ALL">Todos os Grupos</option>
+              </select>
+            </div>
+            <div class="filter-wrapper">
+              <span>Modo:</span>
+              <select class="filter-select" id="exam-mode-select" onchange="onExamModeChange()">
+                <option value="INF">Treino Contínuo</option>
+                <option value="10">Bloco 10 Questões</option>
+                <option value="20">Bloco 20 Questões</option>
+                <option value="30">Bloco 30 Questões</option>
+              </select>
+            </div>
+          </div>
+          <div class="mistakes-controls">
+            <button class="btn-mistakes-toggle" id="btn-mistakes-toggle" onclick="toggleMistakesMode()">
+              Falhas (<span id="mistakes-count">0</span>)
+            </button>
+            <button class="btn-clear-mistakes" title="Limpar todo o registo de falhas" onclick="clearMistakesNotebook()">Limpar</button>
           </div>
         </div>
 
-        <div class="drug-name" id="drug-name">A carregar...</div>
-        <div class="prompt-label">Passo: selecione o <span class="prompt-target" id="prompt-target">Grupo Principal</span></div>
+        <div id="quiz-question-area">
+          <div class="top-bar">
+            <span class="top-title" id="quiz-header-label">Hierarquia Farmacológica</span>
+            <div class="step-indicator">
+              <div class="step-pill active" id="pill-0">Grupo Principal</div>
+              <div class="step-pill" id="pill-1">Subgrupo</div>
+              <div class="step-pill" id="pill-2">Subsubgrupo</div>
+            </div>
+          </div>
 
-        <div class="breadcrumbs" id="breadcrumbs">
-          Cadeia identificada: <span id="trail-text">A iniciar...</span>
+          <div class="drug-name" id="drug-name">A carregar...</div>
+          <div class="prompt-label">Passo: selecione o <span class="prompt-target" id="prompt-target">Grupo Principal</span></div>
+
+          <div class="breadcrumbs" id="breadcrumbs">
+            Cadeia identificada: <span id="trail-text">A iniciar...</span>
+          </div>
+
+          <div class="options-grid" id="options-container"></div>
+          <div class="feedback-card" id="feedback-box"></div>
+
+          <div class="card-footer">
+            <div class="score-tracker" id="score-tracker">Medicamentos concluídos: 0</div>
+            <button class="btn-action" id="btn-action" onclick="advanceTrajectory()">Avançar (Enter)</button>
+          </div>
         </div>
 
-        <div class="options-grid" id="options-container"></div>
+        <div class="exam-results" id="exam-results-area">
+          <h3>Sessão de Exame Concluída</h3>
+          <div class="exam-score-big" id="exam-score-display">0%</div>
+          <p class="exam-details" id="exam-details-text">Acertou 0 de 0 fármacos à primeira tentativa.</p>
+          <button class="btn-action" style="display:inline-block;" onclick="restartExam()">Iniciar Nova Sessão (Enter)</button>
+        </div>
 
-        <div class="feedback-card" id="feedback-box"></div>
+      </div>
+    </main>
+
+    <!-- ABA 2: MODO INVERSO -->
+    <main class="tab-content" id="view-inverse">
+      <div class="card quiz-card">
+        <div class="top-bar">
+          <span class="top-title">Identificação de Princípio Ativo</span>
+        </div>
+
+        <div class="prompt-label" style="margin-bottom: 8px;">Dada a seguinte classificação farmacoterapêutica:</div>
+        
+        <div class="inverse-tree">
+          <div class="tree-step">Grupo: <strong id="inv-group">...</strong></div>
+          <div class="tree-step">Subgrupo: <strong id="inv-subgroup">...</strong></div>
+          <div class="tree-highlight" id="inv-subsubgroup">...</div>
+        </div>
+
+        <div class="prompt-label">Qual dos seguintes medicamentos pertence a esta classe?</div>
+        
+        <div class="options-grid" id="inv-options-container"></div>
+        <div class="feedback-card" id="inv-feedback-box"></div>
 
         <div class="card-footer">
-          <div class="score-tracker" id="score-tracker">Medicamentos concluídos: 0</div>
-          <button class="btn-action" id="btn-action" onclick="advanceTrajectory()">Avançar</button>
+          <div class="score-tracker" id="inv-score-tracker">Acertos no Modo Inverso: 0</div>
+          <button class="btn-action" id="inv-btn-action" onclick="loadInverseQuestion()">Próximo Fármaco (Enter)</button>
         </div>
       </div>
     </main>
 
-    <!-- ABA 2: PRONTUÁRIO -->
+    <!-- ABA 3: PRONTUÁRIO -->
     <main class="tab-content" id="view-guide">
       <div class="card guide-container">
         <div class="guide-header">
@@ -171,7 +281,30 @@
       </div>
     </main>
 
-    <!-- Rodapé -->
+    <!-- ABA 4: RADICAIS DCI -->
+    <main class="tab-content" id="view-dci">
+      <div class="card">
+        <div class="guide-header">
+          <h2>Descodificação de Radicais e Sufixos DCI</h2>
+          <p class="guide-subtitle">Toque no radical para filtrar diretamente todos os representantes da classe no Prontuário.</p>
+        </div>
+
+        <div class="dci-table-wrapper">
+          <table class="dci-table">
+            <thead>
+              <tr>
+                <th>Sufixo / Radical</th>
+                <th>Classe Farmacológica</th>
+                <th>Mecanismo de Ação</th>
+                <th>Exemplos Frequentes</th>
+              </tr>
+            </thead>
+            <tbody id="dci-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+
     <footer class="app-disclaimer">
       <p>
         <strong>Aviso:</strong> Esta aplicação tem fins estritamente pedagógicos e de apoio ao estudo. 
@@ -184,5 +317,10 @@
 
   <script src="medicamentos.js"></script>
   <script src="app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js').catch(() => {});
+    }
+  </script>
 </body>
 </html>
